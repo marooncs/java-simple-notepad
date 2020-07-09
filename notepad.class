@@ -1,0 +1,351 @@
+package demo;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+
+public class notepad {
+	public static void main(String[] args) {
+		CSnotepad notepad=new CSnotepad(); 
+		}
+}
+
+class CSnotepad extends JFrame{
+	private static final long serialVersionUID = 1L;
+	final static JFileChooser fc = new JFileChooser();
+	static File f;
+	static String str="微软雅黑";
+	
+
+	public CSnotepad() {		
+		setBounds(200, 150, 400, 600);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Notepad");
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Container a=getContentPane();
+		
+		//文本域
+		JTextArea t=new JTextArea();
+		t.setFont(new Font(str, Font.PLAIN, 16));
+		t.setForeground(Color.BLUE);
+		t.setRows(20);
+		t.requestFocus();
+		JScrollPane p=new JScrollPane(t);
+		a.add(p);
+		a.validate();
+			
+		//菜单栏
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		Font font=new Font("微软雅黑", Font.PLAIN, 16);
+			//文件栏
+		JMenu fileMenu1 = new JMenu("文件");
+		fileMenu1.setFont(font);
+		menuBar.add(fileMenu1);
+		JMenuItem item1_1=new JMenuItem("新建");
+		item1_1.setFont(font);
+		fileMenu1.add(item1_1);   
+		JMenuItem item1_2=new JMenuItem("打开");
+		item1_2.setFont(font);
+		fileMenu1.add(item1_2);   
+		JMenuItem item1_3=new JMenuItem("保存");
+		item1_3.setFont(font);
+		fileMenu1.add(item1_3);  
+		JMenuItem item1_4=new JMenuItem("另存为");
+		item1_4.setFont(font);
+		fileMenu1.add(item1_4); 
+			//编辑栏
+		JMenu fileMenu2 = new JMenu("编辑");
+		fileMenu2.setFont(font);
+		menuBar.add(fileMenu2);
+		JMenuItem item2_1=new JMenuItem("复制");
+		item2_1.setFont(font);
+		fileMenu2.add(item2_1);
+		JMenuItem item2_2=new JMenuItem("粘贴");
+		item2_2.setFont(font);
+		fileMenu2.add(item2_2);
+		JMenuItem item2_3=new JMenuItem("剪切");
+		item2_3.setFont(font);
+		fileMenu2.add(item2_3);
+		JMenuItem item2_4=new JMenuItem("添加时间");
+		item2_4.setFont(font);
+		fileMenu2.add(item2_4);
+			//格式栏
+		JMenu fileMenu3 = new JMenu("格式");
+		fileMenu3.setFont(font);
+		menuBar.add(fileMenu3);
+		JMenuItem item3_1=new JMenuItem("字体");
+		item3_1.setFont(font);
+		fileMenu3.add(item3_1);
+		JMenuItem item3_2=new JMenuItem("颜色");
+		item3_2.setFont(font);
+		fileMenu3.add(item3_2);
+			//插入栏
+		JMenu fileMenu4 = new JMenu("插入");
+		fileMenu4.setFont(font);
+		menuBar.add(fileMenu4);
+		JMenuItem item4_1=new JMenuItem("分界线");
+		item4_1.setFont(font);
+		fileMenu4.add(item4_1);
+			//帮助栏
+		JMenu fileMenu5 = new JMenu("CSnotepad");
+		fileMenu5.setFont(font);
+		menuBar.add(fileMenu5);
+		JMenuItem item5_1=new JMenuItem("help yourself");
+		item5_1.setFont(font);
+		fileMenu5.add(item5_1);
+		
+		//具体事件监听
+			//文件新建
+		item1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				f=null;
+				t.setText("");
+			}
+		});
+			//文件打开
+		item1_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int flag= fc.showOpenDialog(CSnotepad.this);
+				if (flag == JFileChooser.APPROVE_OPTION) {
+					f = fc.getSelectedFile();	
+					try {
+						FileInputStream in =new FileInputStream(f);
+						byte[] list=new byte[1024];
+						try {
+							int len=0;
+							String s="";
+							while((len=in.read(list))!=-1)
+							{
+								String temp=new String(list,0,len);
+								s+=temp;
+							}
+							t.setText(s);
+							in.close();							
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					}
+				}		
+			}		
+		});
+			//文件保存
+		item1_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(f==null)
+				{
+					savefile(CSnotepad.this,t);
+				}else {
+					try {
+						FileOutputStream out=new FileOutputStream(f);
+						try {
+							out.write(t.getText().getBytes());
+							out.close();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+			//文件另存为
+		item1_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				/*int flag= fc.showSaveDialog(CSnotepad.this);
+				if (flag == JFileChooser.APPROVE_OPTION) {
+					f = fc.getSelectedFile();
+					try {
+						FileOutputStream out=new FileOutputStream(f);
+						try {
+							out.write(t.getText().getBytes());
+							out.close();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					}
+				}*/
+				savefile(CSnotepad.this,t);
+			}
+		});
+		
+				
+			//复制
+		item2_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				t.copy();
+			}
+		});
+			//粘贴
+		item2_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				t.paste();
+			}
+		});
+			//剪切
+		item2_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				t.cut();
+			}
+		});
+			//添加时间	
+		item2_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String strDateFormat = "yyyy-MM-dd HH:mm:ss";
+				SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
+				String date=sdf.format(new Date());
+				t.append(date+"\n");
+			}
+		});
+		
+		//设置字体
+		JDialog diyfont =new JDialog(CSnotepad.this,"设置字体",true);
+		diyfont.setBounds(300, 300, 280, 80);
+		Container d1=diyfont.getContentPane();
+		d1.setLayout(new FlowLayout());
+		String[] items1= {"微软雅黑","楷体","宋体","隶书","幼圆","华文新魏","Arial","Calibri","Times New Roman"};
+		JComboBox<String> com1=new JComboBox<>(items1);
+		d1.add(com1);
+		JButton btn1=new JButton("确定");
+		d1.add(btn1);	
+		item3_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				diyfont.setVisible(true);
+				}
+		});
+		btn1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				str=(String)com1.getSelectedItem();	
+				t.setFont(new Font(str,Font.PLAIN,16));
+			}
+		});
+		//设置颜色
+		JDialog diycolor =new JDialog(CSnotepad.this,"设置颜色",true);
+		diycolor.setBounds(300, 300, 250, 120);
+		Container d2=diycolor.getContentPane();
+		d2.setLayout(new FlowLayout());
+		JLabel l1=new JLabel("字体颜色");
+		JLabel l2=new JLabel("背景颜色");
+		String[] items2= {"黑色","红色","蓝色","绿色","黄色"};
+		String[] items3= {"白色","红色","蓝色","绿色","黄色"};
+		JComboBox<String> com2=new JComboBox<>(items2);
+		JComboBox<String> com3=new JComboBox<>(items3);
+		JButton btn2=new JButton("确定字体颜色");
+		JButton btn3=new JButton("确定背景颜色");
+		d2.add(l1);
+		d2.add(com2);
+		d2.add(btn2);
+		d2.add(l2);
+		d2.add(com3);
+		d2.add(btn3);
+		item3_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				diycolor.setVisible(true);
+				}
+		});
+		btn2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				switch(com2.getSelectedIndex()) {
+				case 0:
+					t.setForeground(Color.BLACK);break;
+				case 1:
+					t.setForeground(Color.RED);break;
+				case 2:
+					t.setForeground(Color.BLUE);break;
+				case 3:	
+					t.setForeground(Color.GREEN);break;
+				case 4:	
+					t.setForeground(Color.YELLOW);break;	
+				}	
+			}
+		});
+		btn3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				switch(com3.getSelectedIndex()) {
+				case 0:
+					t.setBackground(Color.WHITE);break;
+				case 1:
+					t.setBackground(Color.RED);break;
+				case 2:
+					t.setBackground(Color.BLUE);break;
+				case 3:	
+					t.setBackground(Color.GREEN);break;
+				case 4:	
+					t.setBackground(Color.YELLOW);break;
+				}	
+			}
+		});
+		//插入分解线	
+		item4_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				t.append("\n***********************************************\n");
+			}
+		});
+		//
+		item5_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JDialog cs =new JDialog(CSnotepad.this,"简介",true);
+				cs.setBounds(300, 300, 380, 100);
+				Container c=cs.getContentPane();
+				c.setLayout(new FlowLayout());
+				JLabel l1=new JLabel("学了一个星期java，肝了一天做出来的小程序，纪念一下");
+				JLabel l2=new JLabel("MaroonCs");
+				c.add(l1);		
+				c.add(l2);
+				c.validate();
+				cs.setVisible(true);
+			}
+		});
+		
+	}
+	//另存为方法
+	public static void savefile(Component com,JTextArea t) {
+		int flag= fc.showSaveDialog(com);
+		if (flag == JFileChooser.APPROVE_OPTION) {
+			f = fc.getSelectedFile();
+			try {
+				FileOutputStream out=new FileOutputStream(f);
+				try {
+					out.write(t.getText().getBytes());
+					out.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+	
+}
